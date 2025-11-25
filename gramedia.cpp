@@ -67,18 +67,18 @@ Node *minValueNode(Node *node)
     return current;
 }
 
-Node *deleteNode(Node *root, int ID, string judulbuku)
+Node *deleteNode(Node *root, int ID)
 {
     if (root == nullptr)
         return root;
 
     if (ID < root->ID)
     {
-        root->left = deleteNode(root->left, ID, judulbuku);
+        root->left = deleteNode(root->left, ID);
     }
     else if (ID > root->ID)
     {
-        root->right = deleteNode(root->right, ID, judulbuku);
+        root->right = deleteNode(root->right, ID);
     }
     else
     {
@@ -96,7 +96,7 @@ Node *deleteNode(Node *root, int ID, string judulbuku)
         }
         Node *temp = minValueNode(root->right);
         root->ID - temp->ID;
-        root->right = deleteNode(root->right, ID, judulbuku);
+        root->right = deleteNode(root->right, ID);
     }
     return root;
 }
@@ -111,8 +111,12 @@ int main()
     root = insertNode(root, 40, "Gelo dor dor 4");
     root = insertNode(root, 30, "Gelo dor dor 5");
     root = insertNode(root, 60, "Gelo dor dor Limited edition");
+    root = deleteNode(root, 60);
 
     cout << "In-order Traversal (sorted): ";
     inorderTraversal(root);
+    Node *found = searchNode(root, 30);
+    cout << endl
+         << found->ID << " " << found->judulbuku;
     cout << endl;
 }
