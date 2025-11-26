@@ -7,6 +7,7 @@ struct Node
     int ID;
     Node *left;
     Node *right;
+    int height;
 };
 
 Node *createNode(int ID, string judulbuku)
@@ -15,8 +16,29 @@ Node *createNode(int ID, string judulbuku)
     newNode->ID = ID;
     newNode->judulbuku = judulbuku;
     newNode->left = newNode->right = nullptr;
+    newNode->height = 1;
     return newNode;
 }
+
+
+int height(Node *N){
+    if(N == nullptr){
+        return 0;
+    }
+    return N->height;
+}
+
+int getbalance(Node *N){
+    if(N == nullptr){
+        return 0;
+    }
+    return height(N->left) - height(N->right);
+}
+
+void updateHeight(Node *N){
+    N->height = 1 + max(height(N->left), height(N->right));
+}
+
 
 Node *insertNode(Node *root, int ID, string judulbuku)
 {
@@ -32,6 +54,8 @@ Node *insertNode(Node *root, int ID, string judulbuku)
     {
         root->right = insertNode(root->right, ID, judulbuku);
     }
+    updateHeight(root);
+    int balance = getbalance(root);
     return root;
 }
 
