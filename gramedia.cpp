@@ -39,6 +39,32 @@ void updateHeight(Node *N){
     N->height = 1 + max(height(N->left), height(N->right));
 }
 
+Node * rotateleft(Node *N){
+    Node *temp = N->right;
+    Node *empty = temp->left;
+
+    temp->left = N;
+    N->right = empty;
+
+    updateHeight(N);
+    updateHeight(temp);
+
+    return temp;
+}
+
+Node * rotateright(Node *N){
+    Node *temp = N->left;
+    Node *empty = temp->right;
+
+    temp->right = N;
+    N->left = empty;
+
+    updateHeight(N);
+    updateHeight(temp);
+
+    return temp;
+}
+
 
 Node *insertNode(Node *root, int ID, string judulbuku)
 {
@@ -56,17 +82,45 @@ Node *insertNode(Node *root, int ID, string judulbuku)
     }
     updateHeight(root);
     int balance = getbalance(root);
+
+    // cout << balance << endl;
+    // cout << root->height <<"-" << root->judulbuku << endl;
+
+    if(balance < -1 && ID > root->right->ID){
+        return rotateleft(root);
+    }
+    else if(balance > 1 && ID < root->left->ID){
+        return rotateright(root);
+    }
+    else if(balance < -1 && ID < root->right->ID){
+        root->right = rotateright(root->right);
+        return rotateleft(root);
+    }
+    else if(balance > 1 && ID > root->left->ID){
+        root->left = rotateleft(root->left);
+        return rotateright(root);
+    }
+
     return root;
 }
 
-void inorderTraversal(Node *root)
+void tampil(Node *root, int step = 0)
 {
-    if (root != nullptr)
+    if (root == nullptr)
     {
-        inorderTraversal(root->left);
-        cout << root->ID << " ";
-        inorderTraversal(root->right);
+        if(step == 0){
+            cout << "Buku Kosong";
+        }
+        return;
     }
+
+    tampil(root->left, ++step);
+    cout << getbalance(root) << "=";
+    cout << root->height << "\t";
+    cout << root->ID << "\t";
+    cout << root->judulbuku << "\n";
+
+    tampil(root->right, ++step);
 }
 Node *searchNode(Node *root, int key)
 {
@@ -132,15 +186,7 @@ int main()
     root = insertNode(root, 10, "Gelo dor dor 1");
     root = insertNode(root, 20, "Gelo dor dor 2");
     root = insertNode(root, 50, "Gelo dor dor 3");
-    root = insertNode(root, 40, "Gelo dor dor 4");
-    root = insertNode(root, 30, "Gelo dor dor 5");
-    root = insertNode(root, 60, "Gelo dor dor Limited edition");
-    root = deleteNode(root, 60);
-
-    cout << "In-order Traversal (sorted): ";
-    inorderTraversal(root);
-    Node *found = searchNode(root, 30);
-    cout << endl
-         << found->ID << " " << found->judulbuku;
-    cout << endl;
+    // root = insertNode(root, 40, "Gelo dor dor 4");
+    // root = insertNode(root, 30, "Gelo dor dor 5");
+    tampil(root);
 }
