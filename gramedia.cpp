@@ -104,24 +104,7 @@ Node *insertNode(Node *root, int ID, string judulbuku)
     return root;
 }
 
-void tampil(Node *root, int step = 0)
-{
-    if (root == nullptr)
-    {
-        if(step == 0){
-            cout << "Buku Kosong";
-        }
-        return;
-    }
 
-    tampil(root->left, ++step);
-    cout << getbalance(root) << "=";
-    cout << root->height << "\t";
-    cout << root->ID << "\t";
-    cout << root->judulbuku << "\n";
-
-    tampil(root->right, ++step);
-}
 Node *searchNode(Node *root, int key)
 {
     if (root == nullptr || root->ID == key)
@@ -135,14 +118,13 @@ Node *searchNode(Node *root, int key)
     return searchNode(root->left, key);
 }
 
-Node *minValueNode(Node *node)
+Node *minValue(Node *node)
 {
-    Node *current = node;
-    while (current && current->left != nullptr)
+    while(node->left != nullptr)
     {
-        current = current->left;
+        node = node->left;
     }
-    return current;
+    return node;
 }
 
 Node *deleteNode(Node *root, int ID)
@@ -150,7 +132,7 @@ Node *deleteNode(Node *root, int ID)
     if (root == nullptr)
         return root;
 
-    if (ID < root->ID)
+    else if (ID < root->ID)
     {
         root->left = deleteNode(root->left, ID);
     }
@@ -172,11 +154,48 @@ Node *deleteNode(Node *root, int ID)
             delete root;
             return temp;
         }
-        Node *temp = minValueNode(root->right);
-        root->ID - temp->ID;
-        root->right = deleteNode(root->right, ID);
+        Node *temp = minValue(root->right);
+        root->ID = temp->ID;
+        root->judulbuku = temp->judulbuku;
+        root->right = deleteNode(root->right, temp->ID);
+    }
+    updateHeight(root);
+    int balance = getbalance(root);
+
+    if(balance < -1 && getbalance(root->right) < 0){
+        return rotateleft(root);
+    }
+    else if(balance > 1 && getbalance(root->left) > 0){
+        return rotateright(root);
+    }
+    else if(balance < -1 && getbalance(root->right) > 0){
+        root->right = rotateright(root->right);
+        return rotateleft(root);
+    }
+    else if(balance > 1 && getbalance(root->left) < 0){
+        root->left = rotateleft(root->left);
+        return rotateright(root);
     }
     return root;
+}
+
+void tampil(Node *root, int step = 0)
+{
+    if (root == nullptr)
+    {
+        if(step == 0){
+            cout << "Buku Kosong";
+        }
+        return;
+    }
+
+    tampil(root->left, ++step);
+    cout << getbalance(root) << "=";
+    cout << root->height << "\t";
+    cout << root->ID << "\t";
+    cout << root->judulbuku << "\n";
+
+    tampil(root->right, ++step);
 }
 
 int main()
@@ -185,8 +204,11 @@ int main()
 
     root = insertNode(root, 10, "Gelo dor dor 1");
     root = insertNode(root, 20, "Gelo dor dor 2");
-    root = insertNode(root, 50, "Gelo dor dor 3");
-    // root = insertNode(root, 40, "Gelo dor dor 4");
-    // root = insertNode(root, 30, "Gelo dor dor 5");
+    root = insertNode(root, 30, "Gelo dor dor 3");
+    root = insertNode(root, 40, "Gelo dor dor 4");
+    root = insertNode(root, 50, "Gelo dor dor 5");
+    tampil(root);
+    cout << endl;
+    root = deleteNode(root, 40);
     tampil(root);
 }
