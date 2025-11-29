@@ -183,6 +183,21 @@ Node *deleteNode(Node *root, int ID)
     return root;
 }
 
+Node *search(Node *root, int id){
+    if(root == nullptr){
+        return nullptr;
+    }
+    else if(id == root->ID){
+        return root;
+    }
+    else if(id <= root->ID){
+        return search(root->left, id);
+    }
+    else{
+        return search(root->right, id);
+    }
+}
+
 void tampil(Node *root, int step = 0)
 {
     if (root == nullptr)
@@ -197,7 +212,7 @@ void tampil(Node *root, int step = 0)
     cout << getbalance(root) << "=";
     cout << root->height << "\t";
     cout << root->ID << "\t";
-    cout << root->judulbuku << "\t";
+    cout << root->judulbuku << "\t\t";
     cout << root->penulis << "\t";
     cout << root->kategori << endl;
 
@@ -210,10 +225,12 @@ int main()
 
     root = insertNode(root, 10, "One Piece Volume 32", "Eril", "Manga");
     root = insertNode(root, 20, "Cinta ini membunuhku", "Bozu", "Novel");
-    root = insertNode(root, 30, "Resep Dapur Ibu", "Erad", "Resep Masakan");
+    root = insertNode(root, 30, "Resep Dapur Ibu Terbaik", "Erad", "Resep Masakan");
     root = insertNode(root, 40, "Life is like a dih", "Bagas", "Motivasi");
     root = insertNode(root, 50, "5 menit paham rotasi jungle", "Impi", "Pelajaran");
     tampil(root);
+    Node *hasil = search(root, 50);
+    cout << hasil->judulbuku;
     // cout << endl;
     // root = deleteNode(root, 40);
     // tampil(root);
