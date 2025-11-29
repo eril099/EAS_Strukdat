@@ -3,18 +3,20 @@ using namespace std;
 
 struct Node
 {
-    string judulbuku;
+    string judulbuku, penulis, kategori;
     int ID;
     Node *left;
     Node *right;
     int height;
 };
 
-Node *createNode(int ID, string judulbuku)
+Node *createNode(int ID, string judulbuku, string penulis, string kategori)
 {
     Node *newNode = new Node();
     newNode->ID = ID;
     newNode->judulbuku = judulbuku;
+    newNode->penulis = penulis;
+    newNode->kategori = kategori;
     newNode->left = newNode->right = nullptr;
     newNode->height = 1;
     return newNode;
@@ -66,19 +68,19 @@ Node * rotateright(Node *N){
 }
 
 
-Node *insertNode(Node *root, int ID, string judulbuku)
+Node *insertNode(Node *root, int ID, string judulbuku, string penulis, string kategori)
 {
     if (root == nullptr)
     {
-        return createNode(ID, judulbuku);
+        return createNode(ID, judulbuku, penulis, kategori);
     }
     if (ID < root->ID)
     {
-        root->left = insertNode(root->left, ID, judulbuku);
+        root->left = insertNode(root->left, ID, judulbuku, penulis, kategori);
     }
     else if (ID > root->ID)
     {
-        root->right = insertNode(root->right, ID, judulbuku);
+        root->right = insertNode(root->right, ID, judulbuku, penulis, kategori);
     }
     updateHeight(root);
     int balance = getbalance(root);
@@ -157,6 +159,8 @@ Node *deleteNode(Node *root, int ID)
         Node *temp = minValue(root->right);
         root->ID = temp->ID;
         root->judulbuku = temp->judulbuku;
+        root->penulis = temp->penulis;
+        root->kategori = temp->kategori;
         root->right = deleteNode(root->right, temp->ID);
     }
     updateHeight(root);
@@ -193,7 +197,9 @@ void tampil(Node *root, int step = 0)
     cout << getbalance(root) << "=";
     cout << root->height << "\t";
     cout << root->ID << "\t";
-    cout << root->judulbuku << "\n";
+    cout << root->judulbuku << "\t";
+    cout << root->penulis << "\t";
+    cout << root->kategori << endl;
 
     tampil(root->right, ++step);
 }
@@ -202,13 +208,13 @@ int main()
 {
     Node *root = nullptr;
 
-    root = insertNode(root, 10, "Gelo dor dor 1");
-    root = insertNode(root, 20, "Gelo dor dor 2");
-    root = insertNode(root, 30, "Gelo dor dor 3");
-    root = insertNode(root, 40, "Gelo dor dor 4");
-    root = insertNode(root, 50, "Gelo dor dor 5");
+    root = insertNode(root, 10, "One Piece Volume 32", "Eril", "Manga");
+    root = insertNode(root, 20, "Cinta ini membunuhku", "Bozu", "Novel");
+    root = insertNode(root, 30, "Resep Dapur Ibu", "Erad", "Resep Masakan");
+    root = insertNode(root, 40, "Life is like a dih", "Bagas", "Motivasi");
+    root = insertNode(root, 50, "5 menit paham rotasi jungle", "Impi", "Pelajaran");
     tampil(root);
-    cout << endl;
-    root = deleteNode(root, 40);
-    tampil(root);
+    // cout << endl;
+    // root = deleteNode(root, 40);
+    // tampil(root);
 }
