@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 struct Node
@@ -84,9 +86,6 @@ Node *insertNode(Node *root, int ID, string judulbuku, string penulis, string ka
     }
     updateHeight(root);
     int balance = getbalance(root);
-
-    // cout << balance << endl;
-    // cout << root->height <<"-" << root->judulbuku << endl;
 
     if(balance < -1 && ID > root->right->ID){
         return rotateleft(root);
@@ -209,8 +208,8 @@ void tampil(Node *root, int step = 0)
     }
 
     tampil(root->left, ++step);
-    cout << getbalance(root) << "=";
-    cout << root->height << "\t";
+    // cout << getbalance(root) << "=";
+    // cout << root->height << "\t";
     cout << root->ID << "\t";
     cout << root->judulbuku << "\t\t";
     cout << root->penulis << "\t";
@@ -219,19 +218,111 @@ void tampil(Node *root, int step = 0)
     tampil(root->right, ++step);
 }
 
+void savefile(Node *root, ofstream &file){
+    if(root == nullptr){
+        return;
+    }
+    savefile(root->left, file);
+
+    file << root->judulbuku << ";" << root->penulis << ";" << root->kategori << endl;
+
+    savefile(root->right, file);
+}
+
+void updatefile(Node *root){
+    ofstream file("data.txt", ios::trunc);
+    if(file.is_open()){
+        savefile(root, file);
+        file.close();
+    }
+    else{
+        cout << "Gagal Menyimpan data" << endl;
+    }
+
+}
+
 int main()
 {
     Node *root = nullptr;
+    int pilihan;
+    int id = 1;
+    ifstream file("data.txt");
+    if(!file){
+        cout << "Data tidak dapat dibuka";
+        return 1;
+    }
+    string line;
+    while(getline(file, line)){
+        stringstream ss(line);
+        string judul, penulis, kategori;
 
-    root = insertNode(root, 10, "One Piece Volume 32", "Eril", "Manga");
-    root = insertNode(root, 20, "Cinta ini membunuhku", "Bozu", "Novel");
-    root = insertNode(root, 30, "Resep Dapur Ibu Terbaik", "Erad", "Resep Masakan");
-    root = insertNode(root, 40, "Life is like a dih", "Bagas", "Motivasi");
-    root = insertNode(root, 50, "5 menit paham rotasi jungle", "Impi", "Pelajaran");
-    tampil(root);
-    Node *hasil = search(root, 50);
-    cout << hasil->judulbuku;
-    // cout << endl;
-    // root = deleteNode(root, 40);
-    // tampil(root);
+        getline(ss, judul, ';');
+        getline(ss, penulis, ';');
+        getline(ss, kategori, ';');
+
+        if(!judul.empty()){
+            root = insertNode(root, id++, judul, penulis, kategori);
+        }
+    }
+    file.close();
+
+    do{
+        cout << "===========Data Base Gramedia===========" << endl;
+        cout << "1. Insert\n2. Delete\n3. Search\n4. View\n0. Keluar\nPilihan: ";
+        cin >> pilihan;
+        cin.ignore();
+
+        if(pilihan == 1){
+            string j, p, k;
+            cout << "Masukkan Judul Buku: ";
+            getline(cin, j);
+            cout << "Masukkan Penulis: ";
+            getline(cin, p);
+            cout << "Masukkan Kategori: ";
+            getline(cin, k);
+
+            root = insertNode(root, id, j, p, k);
+            cout << "Berhasil Input" << endl;
+            id++;
+            updatefile(root);
+        }
+        else if(pilihan == 2){
+            int targetID;
+            cout << "Masukkan ID buku yang ingin dihapus: ";
+            cin >> targetID;
+
+            if(search(root, targetID) != nullptr){
+                root = deleteNode(root, targetID);
+                cout << "Buku dengan id: " << targetID << " Berhasil dihapus" << endl;
+                updatefile(root);
+            }
+            else{
+                cout << "ID tidak ditemukan!" << endl;
+            }
+        }
+        else if(pilihan == 3){
+            int targetID;
+            cout << "Masukkan ID yang ingin dicari: ";
+            cin >> targetID;
+            Node *hasil = search(root, targetID);
+
+            if(hasil){
+                cout << "===DITEMUKAN===" << endl;
+                cout << "ID\t\t: " << hasil->ID << endl;
+                cout << "Judul\t\t: " << hasil->judulbuku << endl;
+                cout << "Penulis\t\t: " << hasil->penulis << endl;
+                cout << "Kategori\t: " << hasil->kategori << endl;
+            }
+            else{
+                cout << "Buku tidak ditemukan!" << endl;
+            }
+        }
+        else if(pilihan == 4){
+            cout << "\nData Buku di Tree:" << endl;
+            cout << "ID\tInfo Buku" << endl;
+            cout << "-------------------------" << endl;
+            tampil(root);
+        }
+    } while(pilihan != 0);
+    return 0;
 }
